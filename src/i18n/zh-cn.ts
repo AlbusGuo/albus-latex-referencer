@@ -90,6 +90,8 @@ export const zhCN: TranslationKeys = {
 		labelPrefixDesc: '用于确保标签不冲突。例如：当"Pandoc 标签前缀"= "foo:" 时，一个"Pandoc 标签"= "bar" 的定理会被分配为 "thm:foo:bar"。',
 		
 		theoremCalloutsNumbering: '定理标注 - 编号',
+		numberingMode: '编号模式',
+		numberingModeDesc: '选择定理标注的编号方式：“统一编号”（默认）- 所有类型共用一个计数器（定理 1、定义 2、引理 3、...）；“分开编号”- 每种类型有自己的计数器（定理 1、定义 1、引理 1、...）；“详细编号”- 预留以供未来使用。',
 		inferNumberPrefix: '从笔记标题或属性推断前缀',
 		inferNumberPrefixDesc: '自动从笔记标题或属性推断前缀。请参阅文档（设置 > 前缀推断）中的示例。',
 		inferNumberPrefixFromProperty: '使用属性作为来源',

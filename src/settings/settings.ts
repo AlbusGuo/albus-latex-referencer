@@ -15,6 +15,13 @@ export const NUMBER_STYLES = [
 ] as const;
 export type NumberStyle = typeof NUMBER_STYLES[number];
 
+export const NUMBERING_MODES = [
+    "unified",
+    "separate",
+    "detailed"
+] as const;
+export type NumberingMode = typeof NUMBERING_MODES[number];
+
 export const THEOREM_CALLOUT_STYLES = [
     "Custom", 
     "Plain",
@@ -61,6 +68,7 @@ export type SearchMethod = typeof SEARCH_METHODS[number];
 export interface MathContextSettings {
     profile: string;
     titleSuffix: string;
+    numberingMode: NumberingMode;
     inferNumberPrefix: boolean;
     inferNumberPrefixFromProperty: string;
     inferNumberPrefixRegExp: string;
@@ -92,6 +100,7 @@ export interface MathContextSettings {
 }
 
 export const UNION_TYPE_MATH_CONTEXT_SETTING_KEYS: {[k in keyof Partial<MathContextSettings>]: readonly string[]} = {
+    "numberingMode": NUMBERING_MODES,
     "numberStyle": NUMBER_STYLES,
     "refFormat": THEOREM_REF_FORMATS,
     "noteMathLinkFormat": THEOREM_REF_FORMATS,
@@ -192,6 +201,7 @@ export type ResolvedMathSettings = Required<MathContextSettings> & TheoremCallou
 export const DEFAULT_SETTINGS: Required<MathContextSettings> = {
     profile: Object.keys(DEFAULT_PROFILES)[0],
     titleSuffix: ".",
+    numberingMode: "unified",
     inferNumberPrefix: true,
     inferNumberPrefixFromProperty: "",
     inferNumberPrefixRegExp: "^[0-9]+(\\.[0-9]+)*",

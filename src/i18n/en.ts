@@ -88,6 +88,8 @@ export const en = {
 		labelPrefixDesc: 'Useful for ensuring no label collision. Ex) When "Pandoc label prefix" = "foo:", A theorem with "Pandoc label" = "bar" is assigned "thm:foo:bar."',
 		
 		theoremCalloutsNumbering: 'Theorem callouts - numbering',
+		numberingMode: 'Numbering mode',
+		numberingModeDesc: 'Choose how theorem callouts are numbered: "Unified" (default) - all types share one counter (Theorem 1, Definition 2, Lemma 3, ...); "Separate" - each type has its own counter (Theorem 1, Definition 1, Lemma 1, ...); "Detailed" - reserved for future use.',
 		inferNumberPrefix: 'Infer prefix from note title or properties',
 		inferNumberPrefixDesc: 'Automatically infer a prefix from the note title or properties. See the documentation (Settings > Prefix inference) for an example.',
 		inferNumberPrefixFromProperty: 'Use property as source',

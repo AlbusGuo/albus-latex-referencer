@@ -2,7 +2,7 @@ import { ButtonComponent, Setting, SliderComponent, TAbstractFile, TFile, TFolde
 
 import LatexReferencer from 'main';
 import { THEOREM_LIKE_ENV_IDs, THEOREM_LIKE_ENVs, TheoremLikeEnvID } from 'env';
-import { DEFAULT_SETTINGS, ExtraSettings, LEAF_OPTIONS, THEOREM_REF_FORMATS, THEOREM_CALLOUT_STYLES, TheoremCalloutSettings, MathContextSettings, NUMBER_STYLES, FoldOption, DEFAULT_EXTRA_SETTINGS } from 'settings/settings';
+import { DEFAULT_SETTINGS, ExtraSettings, LEAF_OPTIONS, THEOREM_REF_FORMATS, THEOREM_CALLOUT_STYLES, TheoremCalloutSettings, MathContextSettings, NUMBER_STYLES, FoldOption, DEFAULT_EXTRA_SETTINGS, NUMBERING_MODES } from 'settings/settings';
 import { formatTheoremCalloutType } from 'utils/format';
 import { NumberKeys, BooleanKeys } from 'utils/general';
 import { DEFAULT_PROFILES, ManageProfileModal } from './profile';
@@ -285,6 +285,7 @@ export class MathContextSettingsHelper extends SettingsHelper<MathContextSetting
 
         this.addHeading(t('settings.theoremCalloutsNumbering'));
 
+        this.addDropdownSetting("numberingMode", NUMBERING_MODES, t('settings.numberingMode'), t('settings.numberingModeDesc'));
         this.addToggleSetting(
             "inferNumberPrefix",
             t('settings.inferNumberPrefix'),

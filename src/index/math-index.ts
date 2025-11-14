@@ -267,6 +267,8 @@ export class MathIndex {
 
         let theorems: TheoremCalloutBlock[] = []
         let autoNumberedTheoremCount = 0;
+        // For separate numbering mode: maintain a separate counter for each theorem type
+        const separateCounters: Record<string, number> = {};
         let mainTheorem: TheoremCalloutBlock | null = null;
 
         const equationNumberInit = +(settings.eqNumberInit);
@@ -283,8 +285,20 @@ export class MathIndex {
                 // They may be additionally formatted according to the settings.
                 const resolvedSettings = Object.assign({}, settings, block.$settings);
                 if (block.$settings.number == 'auto') {
-                    block.$index = autoNumberedTheoremCount;
-                    (resolvedSettings as ResolvedMathSettings)._index = autoNumberedTheoremCount++;
+                    // Choose the counter based on the numbering mode
+                    if (settings.numberingMode === 'separate') {
+                        // Separate numbering: each type has its own counter
+                        const type = block.$settings.type;
+                        if (!(type in separateCounters)) {
+                            separateCounters[type] = 0;
+                        }
+                        block.$index = separateCounters[type];
+                        (resolvedSettings as ResolvedMathSettings)._index = separateCounters[type]++;
+                    } else {
+                        // Unified numbering (default): all types share one counter
+                        block.$index = autoNumberedTheoremCount;
+                        (resolvedSettings as ResolvedMathSettings)._index = autoNumberedTheoremCount++;
+                    }
                 }
                 // const printName = formatTitle(this.plugin, file, resolvedSettings);
                 const mainTitle = formatTitleWithoutSubtitle(this.plugin, file, resolvedSettings);
