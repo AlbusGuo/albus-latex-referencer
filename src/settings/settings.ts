@@ -21,6 +21,7 @@ export const THEOREM_CALLOUT_STYLES = [
     "Framed",
     "MathWiki",
     "Vivid",
+    "Card",
 ] as const;
 export type TheoremCalloutStyle = typeof THEOREM_CALLOUT_STYLES[number];
 

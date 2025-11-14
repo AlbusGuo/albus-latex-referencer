@@ -1,0 +1,62 @@
+@mixin card {
+    /* 
+    If you're going to use this file as a CSS snippet, only include the code between 
+    the START and END comments to your snippet file.
+    */
+    /* START */
+    
+    /* 数学公式过长添加滚动条 */
+    .math {
+        overflow-y: auto;
+    }
+
+    /* Common styles for all theorem callouts */
+    .callout.theorem-callout {
+        background-color: var(--background-primary-alt);
+        border-radius: 6px;
+        padding-left: 10px !important;
+        padding-bottom: 0px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    /* Purple border for theorem-like callouts */
+    .callout.theorem-callout-claim,
+    .callout.theorem-callout-theorem,
+    .callout.theorem-callout-lemma,
+    .callout.theorem-callout-corollary,
+    .callout.theorem-callout-proposition {
+        border-left: 8px solid slateblue !important;
+    }
+
+    /* Green border for definition-like callouts */
+    .callout.theorem-callout-axiom,
+    .callout.theorem-callout-definition {
+        border-left: 8px solid #56cf8e !important;
+    }
+
+    /* Yellow border for example-like callouts */
+    .callout.theorem-callout-exercise,
+    .callout.theorem-callout-example {
+        border-left: 8px solid #ffce65 !important;
+    }
+
+    /* Callout title styling */
+    .callout.theorem-callout .callout-title {
+        color: var(--text-normal) !important;
+        background-color: transparent;
+        padding-left: 0 !important;
+    }
+
+    /* Callout content styling */
+    .callout.theorem-callout .callout-content {
+        padding-left: 0 !important;
+    }
+
+    /* Hide default callout icons */
+    .callout.theorem-callout .callout-icon {
+        display: none;
+    }
+    
+    /* END */
+}
