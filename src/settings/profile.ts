@@ -4,6 +4,7 @@ import LatexReferencer, { VAULT_ROOT } from '../main';
 import { THEOREM_LIKE_ENV_IDs, TheoremLikeEnvID } from '../env';
 import { MathContextSettingsHelper } from '../settings/helper';
 import { DEFAULT_SETTINGS } from './settings';
+import { t } from 'i18n';
 
 
 export type ProfileMeta = { tags: string[] };
@@ -98,10 +99,10 @@ export class ManageProfileModal extends Modal {
 
         contentEl.empty();
         // contentEl.createEl("h4", { text: "Manage profiles" });
-        this.titleEl.setText("Manage profiles");
+        this.titleEl.setText(t('settings.manageProfiles'));
 
         new Setting(contentEl)
-            .setName("Add profile")
+            .setName(t('settings.addProfile'))
             .addButton((button) => {
                 button.setIcon("plus").onClick(() => {
                     new AddProfileModal(this).open()
@@ -167,10 +168,10 @@ class EditProfileModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
         // contentEl.createEl("h4", { text: `Edit profile` });
-        this.titleEl.setText(`Edit profile`);
+        this.titleEl.setText(t('settings.editProfile'));
 
         new Setting(contentEl)
-            .setName("Name")
+            .setName(t('settings.profileName'))
             .addText((text) => {
                 text.setValue(this.profile.id)
                     .onChange((value) => {
@@ -179,8 +180,8 @@ class EditProfileModal extends Modal {
             });
 
         new Setting(contentEl)
-            .setName("Tags")
-            .setDesc("Comma-separated list of tags. Only lower-case alphabets or hyphens are allowed. Each tag is converted into a CSS class \".theorem-callout-<tag>\".")
+            .setName(t('settings.profileTags'))
+            .setDesc(t('settings.profileTagsDesc'))
             .addText((text) => {
                 text.setValue(this.profile.meta.tags.join(", "))
                     .onChange((value) => {
@@ -188,13 +189,13 @@ class EditProfileModal extends Modal {
                         if (tags.every((tag) => tag.match(/^[a-z\-]+$/) ?? !tag)) {
                             this.profile.meta.tags = tags;
                         } else {
-                            new Notice("A tag can only contain lower-case alphabets or hyphens.", 5000);
+                            new Notice(t('settings.profileTagsError'), 5000);
                         }
                     });
             });
 
         // contentEl.createEl("h5", { text: "Theorem-like environments" });
-        new Setting(contentEl).setName("Theorem-like environments").setHeading();
+        new Setting(contentEl).setName(t('settings.theoremLikeEnvironments')).setHeading();
 
         for (const envID of THEOREM_LIKE_ENV_IDs) {
             this.settingRefs[envID] = new Setting(contentEl).setName(envID).addText((text) => {
@@ -206,13 +207,13 @@ class EditProfileModal extends Modal {
         }
 
         // contentEl.createEl("h5", { text: "Proofs" });
-        new Setting(contentEl).setName("Proofs").setHeading();
+        new Setting(contentEl).setName(t('settings.proofs')).setHeading();
 
         const prettyNames = [
-            "Beginning of proof",
-            "Ending of proof",
-            "Prefix", 
-            "Suffix",
+            t('settings.beginningOfProof'),
+            t('settings.endingOfProof'),
+            t('settings.prefix'), 
+            t('settings.suffix'),
         ];
         for (let i = 0; i < PROOF_SETTING_KEYS.length; i++) {
             const key = PROOF_SETTING_KEYS[i];
@@ -227,8 +228,8 @@ class EditProfileModal extends Modal {
 
         // const linkedProofHeading = contentEl.createEl("h6", {text: "Linked proofs"});
         const linkedProofHeading = new Setting(contentEl)
-        .setName("Linked proofs")
-        .setDesc(`For example, you can render \`${DEFAULT_SETTINGS.beginProof}\`@[[link to Theorem 1]] as "${DEFAULT_PROFILES[DEFAULT_SETTINGS.profile].body.proof.linkedBeginPrefix}Theorem 1${DEFAULT_PROFILES[DEFAULT_SETTINGS.profile].body.proof.linkedBeginSuffix}".`)
+        .setName(t('settings.linkedProofs'))
+        .setDesc(t('settings.linkedProofsDesc'))
         .setHeading().settingEl;
         // const linkedProofDesc = contentEl.createDiv({ 
         //     text: `For example, you can render \`${DEFAULT_SETTINGS.beginProof}\`@[[link to Theorem 1]] as "${DEFAULT_PROFILES[DEFAULT_SETTINGS.profile].body.proof.linkedBeginPrefix}Theorem 1${DEFAULT_PROFILES[DEFAULT_SETTINGS.profile].body.proof.linkedBeginSuffix}".`,
@@ -267,12 +268,12 @@ class ConfirmProfileDeletionModal extends Modal {
         contentEl.empty();
 
         // contentEl.createEl("h3", { text: "Delete profile" });
-        this.titleEl.setText("Delete profile");
+        this.titleEl.setText(t('settings.deleteProfile'));
 
-        contentEl.createDiv({ text: `Are you sure you want to delete the profile "${this.id}"?` });
+        contentEl.createDiv({ text: `${t('modals.confirmDelete')} "${this.id}"?` });
         const buttonContainerEl = contentEl.createDiv({ cls: "math-booster-button-container" });
         new ButtonComponent(buttonContainerEl)
-            .setButtonText("Delete")
+            .setButtonText(t('modals.delete'))
             .setCta()
             .onClick(() => {
                 const affected = getAffectedFiles(this.parent.plugin, this.id);
@@ -284,7 +285,7 @@ class ConfirmProfileDeletionModal extends Modal {
                 }
             });
         new ButtonComponent(buttonContainerEl)
-            .setButtonText("Cancel")
+            .setButtonText(t('modals.cancel'))
             .onClick(() => {
                 this.close();
             });
@@ -310,19 +311,19 @@ class AddProfileModal extends Modal {
         let id: string;
 
         // contentEl.createEl("h3", { text: "Add profile" });
-        this.titleEl.setText("Add profile");
+        this.titleEl.setText(t('settings.addProfile'));
 
         const addProfileEl = contentEl.createDiv({ cls: "math-booster-add-profile" });
 
         new TextComponent(addProfileEl)
-            .setPlaceholder("Enter name...")
+            .setPlaceholder(t('modals.enterName'))
             .onChange((value) => {
                 id = value;
             });
 
         const buttonContainerEl = addProfileEl.createDiv({ cls: "math-booster-button-container" });
         new ButtonComponent(buttonContainerEl)
-            .setButtonText("Add")
+            .setButtonText(t('modals.add'))
             .setCta()
             .onClick(() => {
                 const newBody = {theorem: {}} as ProfileBody;
@@ -338,7 +339,7 @@ class AddProfileModal extends Modal {
                 this.close();
             });
         new ButtonComponent(buttonContainerEl)
-            .setButtonText("Cancel")
+            .setButtonText(t('modals.cancel'))
             .onClick(() => {
                 this.close();
             });
@@ -362,9 +363,9 @@ class UpdateProfileModal extends Modal {
         contentEl.empty();
 
         // contentEl.createEl("h3", { text: "Update profiles" });
-        this.titleEl.setText("Update profiles");
+        this.titleEl.setText(t('modals.updateProfiles'));
 
-        contentEl.createDiv({ text: `The following ${this.affected.length > 1 ? this.affected.length : ""} local setting${this.affected.length > 1 ? "s are" : " is"} affected by the deletion of profile "${this.deletedID}." Select a new profile to be applied for them.` });
+        contentEl.createDiv({ text: `${t('modals.updateProfilesDesc')} "${this.deletedID}." ${t('modals.updateProfilesDesc2')}` });
 
         const profiles = this.parent.parent.plugin.extraSettings.profiles;
         const ids = Object.keys(profiles);
@@ -383,21 +384,21 @@ class UpdateProfileModal extends Modal {
             newProfileID = value;
         });
         new ButtonComponent(buttonContainerEl)
-            .setButtonText("Confirm")
+            .setButtonText(t('modals.confirm'))
             .setCta()
             .onClick(async () => {
                 updateProfile(this.parent.parent.plugin, this.affected, newProfileID);
                 this.close();
             })
         new ButtonComponent(buttonContainerEl)
-            .setButtonText("Cancel")
+            .setButtonText(t('modals.cancel'))
             .onClick(() => {
                 this.close();
             });
 
         const listEl = contentEl.createEl("ul");
         for (const path of this.affected) {
-            listEl.createEl("li", { text: path == VAULT_ROOT ? "(Vault root)" : path });
+            listEl.createEl("li", { text: path == VAULT_ROOT ? t('modals.vaultRoot') : path });
         }
     }
 

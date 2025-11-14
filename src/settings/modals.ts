@@ -6,6 +6,7 @@ import { MathSettingTab } from "settings/tab";
 import { TheoremCalloutSettingsHelper, MathContextSettingsHelper } from "settings/helper";
 import { isEqualToOrChildOf } from 'utils/obsidian';
 import { resolveSettings } from 'utils/plugin';
+import { t } from 'i18n';
 
 
 abstract class MathSettingModal<SettingsType> extends Modal {
@@ -98,9 +99,9 @@ export class TheoremCalloutModal extends MathSettingModal<MathSettings> {
         helper.makeSettingPane();
 
         new Setting(contentEl)
-            .setName('Open local settings for the current note')
+            .setName(t('modals.openLocalSettingsButton'))
             .addButton((button) => {
-                button.setButtonText("Open")
+                button.setButtonText(t('modals.open'))
                     .onClick(() => {
                         const modal = new ContextSettingModal(
                             this.app,
@@ -138,10 +139,10 @@ export class ContextSettingModal extends MathSettingModal<MathContextSettings> {
         this.component.load();
 
         // contentEl.createEl('h4', { text: 'Local settings for ' + this.file.path });
-        this.titleEl.setText('Local settings for ' + this.file.path);
+        this.titleEl.setText(t('modals.localSettingsFor') + this.file.path);
 
         contentEl.createDiv({
-            text: "If you want the change to apply to the entire vault, go to the plugin settings.",
+            text: t('modals.localSettingsNote'),
             cls: ["setting-item-description", "math-booster-setting-item-description"],
         });
 
@@ -158,7 +159,7 @@ export class ContextSettingModal extends MathSettingModal<MathContextSettings> {
         //     new ProjectSettingsHelper(contentEl, this).makeSettingPane();
         // }
 
-        this.addButton('Save');
+        this.addButton(t('modals.save'));
     }
 
     onClose(): void {
@@ -258,10 +259,10 @@ export class ExcludedFileManageModal extends Modal {
         await this.plugin.saveSettings();
         const { contentEl } = this;
         contentEl.empty();
-        contentEl.createEl('h3', { text: 'Excluded files/folders' });
+        contentEl.createEl('h3', { text: t('modals.excludedFilesTitle') });
 
         new Setting(contentEl)
-            .setName('The files/folders in this list and their descendants will be excluded from suggestion for local settings.')
+            .setName(t('modals.excludedFilesNote'))
             .addButton((btn) => {
                 btn.setIcon("plus")
                     .onClick((event) => {

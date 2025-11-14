@@ -6,6 +6,7 @@ import { EquationBlock, MarkdownBlock, MarkdownPage, TheoremCalloutBlock } from 
 import { getIO } from "file-io";
 import { splitIntoLines } from "./general";
 import { THEOREM_LIKE_ENV_IDs, THEOREM_LIKE_ENV_PREFIXES } from "env";
+import { t } from "i18n";
 
 
 export function resolveSettings(settings: MinimalTheoremCalloutSettings, plugin: LatexReferencer, currentFile: TAbstractFile): ResolvedMathSettings;
@@ -39,7 +40,7 @@ export function getProfileByID(plugin: LatexReferencer, profileID: string) {
 export function staticifyEqNumber(plugin: LatexReferencer, file: TFile) {
     const page = plugin.indexManager.index.load(file.path);
     if (!MarkdownPage.isMarkdownPage(page)) {
-        new Notice(`Failed to fetch the metadata of file ${file.path}.`);
+        new Notice(`${t('notices.failedToFetchMetadata')} ${file.path}.`);
         return;
     }
     const io = getIO(plugin, file);

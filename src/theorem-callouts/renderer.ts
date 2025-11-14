@@ -14,6 +14,7 @@ import { parseTheoremCalloutMetadata, readTheoremCalloutSettings } from 'utils/p
 import { THEOREM_LIKE_ENV_ID_PREFIX_MAP, THEOREM_LIKE_ENV_PREFIX_ID_MAP, TheoremLikeEnvID, TheoremLikeEnvPrefix } from 'env';
 import { getIO } from 'file-io';
 import { MutationObservingChild, getSectionCacheFromMouseEvent, getSectionCacheOfDOM, isPdfExport, resolveLinktext } from 'utils/obsidian';
+import { t } from 'i18n';
 
 
 export const createTheoremCalloutPostProcessor = (plugin: LatexReferencer) => async (element: HTMLElement, context: MarkdownPostProcessorContext) => {
@@ -403,13 +404,13 @@ class TheoremCalloutRenderer extends MarkdownRenderChild {
                     await io.setLine(lineNumber, generateTheoremCalloutFirstLine(settings));
                 } else {
                     new Notice(
-                        `${this.plugin.manifest.name}: Could not find the line number to overwrite. Retry later.`,
+                        `${this.plugin.manifest.name}: ${t('notices.couldNotFindLineNumber')}`,
                         5000
                     )
                 }
             },
-                "Confirm",
-                "Edit theorem callout settings",
+                t('modals.confirm'),
+                t('modals.editTheoremCallout'),
                 readTheoremCalloutSettings(line, this.plugin.extraSettings.excludeExampleCallout)
             ).open();
         });

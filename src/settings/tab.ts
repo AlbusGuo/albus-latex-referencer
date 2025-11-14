@@ -4,6 +4,7 @@ import LatexReferencer, { VAULT_ROOT } from "../main";
 import { DEFAULT_EXTRA_SETTINGS, DEFAULT_SETTINGS } from "./settings";
 import { ExtraSettingsHelper, MathContextSettingsHelper } from "./helper";
 import { ExcludedFileManageModal, LocalContextSettingsSuggestModal } from "settings/modals";
+import { t } from "i18n";
 // import { PROJECT_DESCRIPTION } from "project";
 
 
@@ -18,7 +19,7 @@ export class MathSettingTab extends PluginSettingTab {
     addRestoreDefaultsButton() {
         new Setting(this.containerEl)
             .addButton((btn) => {
-                btn.setButtonText("Restore defaults");
+                btn.setButtonText(t('settings.restoreDefaults'));
                 btn.onClick(async () => {
                     Object.assign(this.plugin.settings[VAULT_ROOT], DEFAULT_SETTINGS);
                     Object.assign(this.plugin.extraSettings, DEFAULT_EXTRA_SETTINGS);
@@ -32,7 +33,7 @@ export class MathSettingTab extends PluginSettingTab {
         containerEl.empty();
         this.component.load();
 
-        containerEl.createEl("h4", { text: "Global" });
+        containerEl.createEl("h4", { text: t('settings.global') });
 
         const root = this.app.vault.getRoot();
         const globalHelper = new MathContextSettingsHelper(
@@ -115,21 +116,21 @@ export class MathSettingTab extends PluginSettingTab {
 
         this.addRestoreDefaultsButton();
 
-        containerEl.createEl("h4", { text: "Local" });
-        new Setting(containerEl).setName("Local settings")
-            .setDesc("You can set up local (i.e. file-specific or folder-specific) settings, which have more precedence than the global settings. Local settings can be configured in various ways; here in the plugin settings, right-clicking in the file explorer, the \"Open local settings for the current file\" command, and the \"Open local settings for the current file\" button in the theorem callout settings pop-ups.")
+        containerEl.createEl("h4", { text: t('settings.local') });
+        new Setting(containerEl).setName(t('settings.localSettings'))
+            .setDesc(t('settings.localSettingsDesc'))
             .addButton((btn) => {
-                btn.setButtonText("Search files & folders")
+                btn.setButtonText(t('settings.searchFilesAndFolders'))
                     .onClick(() => {
                         new LocalContextSettingsSuggestModal(this.app, this.plugin, this).open();
                     });
             });
 
         new Setting(containerEl)
-            .setName("Excluded files")
-            .setDesc("You can make your search results more visible by excluding certain files or folders.")
+            .setName(t('settings.excludedFiles'))
+            .setDesc(t('settings.excludedFilesDesc'))
             .addButton((btn) => {
-                btn.setButtonText("Manage")
+                btn.setButtonText(t('settings.manage'))
                     .onClick(() => {
                         new ExcludedFileManageModal(this.app, this.plugin).open();
                     });

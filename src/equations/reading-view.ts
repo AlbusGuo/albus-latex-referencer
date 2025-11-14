@@ -10,6 +10,7 @@ import { EquationBlock, MarkdownPage } from "index/typings/markdown";
 import { MathIndex } from "index/math-index";
 import { isPdfExport, resolveLinktext } from "utils/obsidian";
 import { replaceMathTag } from "./common";
+import { t } from "i18n";
 
 
 export const createEquationNumberProcessor = (plugin: LatexReferencer) => async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
@@ -41,7 +42,7 @@ function preprocessForPdfExport(plugin: LatexReferencer, el: HTMLElement, ctx: M
 
         const page = plugin.indexManager.index.getMarkdownPage(ctx.sourcePath);
         if (!page) {
-            new Notice(`${plugin.manifest.name}: Failed to fetch the metadata for PDF export; equation numbers will not be displayed in the exported PDF.`);
+            new Notice(`${plugin.manifest.name}: ${t('notices.failedPDFExport')}`);
             return;
         }
 
@@ -56,10 +57,10 @@ function preprocessForPdfExport(plugin: LatexReferencer, el: HTMLElement, ctx: M
         }
 
         if (topLevelMathDivs.length != equationIndex) {
-            new Notice(`${plugin.manifest.name}: Something unexpected occured while preprocessing for PDF export. Equation numbers might not be displayed properly in the exported PDF.`);
+            new Notice(`${plugin.manifest.name}: ${t('notices.unexpectedPDFExport')}`);
         }
     } catch (err) {
-        new Notice(`${plugin.manifest.name}: Something unexpected occured while preprocessing for PDF export. See the developer console for the details. Equation numbers might not be displayed properly in the exported PDF.`);
+        new Notice(`${plugin.manifest.name}: ${t('notices.unexpectedPDFExportDetails')}`);
         console.error(err);
     }
 }

@@ -3,6 +3,7 @@ import { Modal, Setting, Component, MarkdownRenderer, Notice } from "obsidian";
 import LatexReferencer from "main";
 import { isPluginOlderThan } from "utils/obsidian";
 import { rewriteTheoremCalloutFromV1ToV2 } from "utils/plugin";
+import { t } from "i18n";
 
 
 export class PluginSplitNoticeModal extends Modal {
@@ -315,7 +316,7 @@ to the new format:
 
         // @ts-ignore
         if (!this.app.metadataCache.initialized || !this.plugin.indexManager.initialized) {
-            new Notice('Obsidian is still indexing the vault. Try again after the cache is fully initialized.');
+            new Notice(t('notices.obsidianIndexing'));
             return;
         }
 

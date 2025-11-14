@@ -24,6 +24,7 @@ import { patchPagePreview } from 'patches/page-preview';
 import { createProofDecoration } from 'proof/live-preview';
 import { createProofProcessor } from 'proof/reading-view';
 import { MathBlock } from 'index/typings/markdown';
+import { t } from 'i18n';
 
 
 export const VAULT_ROOT = '/';
@@ -289,13 +290,13 @@ export default class LatexReferencer extends Plugin {
 	registerCommands() {
 		this.addCommand({
 			id: 'insert-display-math',
-			name: 'Insert display math',
+			name: t('commands.insertDisplayMath'),
 			editorCallback: insertDisplayMath,
 		});
 
 		this.addCommand({
 			id: 'insert-theorem-callout',
-			name: 'Insert theorem callout',
+			name: t('commands.insertTheoremCallout'),
 			editorCheckCallback: (checking, editor, context) => {
 				if (!context.file) return false;
 
@@ -305,7 +306,7 @@ export default class LatexReferencer extends Plugin {
 						(config) => {
 							insertTheoremCallout(editor, config);
 						},
-						"Insert", "Insert theorem callout",
+						t('modals.insert'), t('commands.insertTheoremCallout'),
 					).open();
 				}
 
@@ -315,7 +316,7 @@ export default class LatexReferencer extends Plugin {
 
 		this.addCommand({
 			id: 'search',
-			name: 'Search',
+			name: t('commands.search'),
 			callback: () => {
 				new MathSearchModal(this).open();
 			}
@@ -323,7 +324,7 @@ export default class LatexReferencer extends Plugin {
 
 		this.addCommand({
 			id: 'open-local-settings-for-current-note',
-			name: 'Open local settings for the current note',
+			name: t('commands.openLocalSettings'),
 			callback: () => {
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (view?.file) {
@@ -334,13 +335,13 @@ export default class LatexReferencer extends Plugin {
 
 		this.addCommand({
 			id: 'insert-proof',
-			name: 'Insert proof',
+			name: t('commands.insertProof'),
 			editorCallback: (editor, context) => insertProof(this, editor, context)
 		});
 
 		this.addCommand({
 			id: 'convert-equation-number-to-tag',
-			name: 'Convert equation numbers in the current note to static \\tag{}',
+			name: t('commands.convertEquationNumber'),
 			callback: () => {
 				const file = this.app.workspace.getActiveFile();
 				if (file) staticifyEqNumber(this, file);
@@ -349,7 +350,7 @@ export default class LatexReferencer extends Plugin {
 
 		this.addCommand({
 			id: 'migrate-from-v1',
-			name: 'Migrate from version 1',
+			name: t('commands.migrateFromV1'),
 			callback: () => {
 				new MigrationModal(this).open();
 			}

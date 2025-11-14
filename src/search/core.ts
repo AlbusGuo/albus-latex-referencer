@@ -9,6 +9,7 @@ import { formatLabel } from 'utils/format';
 import { getModifierNameInPlatform, openFileAndSelectPosition } from 'utils/obsidian';
 import { insertBlockIdIfNotExist, resolveSettings } from 'utils/plugin';
 import { MathSearchModal } from './modal';
+import { t } from 'i18n';
 import { renderTextWithMath } from 'utils/render';
 
 
@@ -212,7 +213,7 @@ export abstract class MathSearchCore {
         }
 
         if (!success) {
-            new Notice(`${this.plugin.manifest.name}: Failed to read cache. Retry again later.`, 5000);
+            new Notice(`${this.plugin.manifest.name}: ${t('notices.failedToReadCache')}`, 5000);
         }
     }
 }

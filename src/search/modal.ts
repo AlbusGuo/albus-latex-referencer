@@ -4,6 +4,7 @@ import LatexReferencer from "main";
 import { App, EditorSuggestContext, MarkdownView, Setting, SuggestModal, TextAreaComponent } from "obsidian";
 import { MathSearchCore, SuggestParent } from "./core";
 import { MathBlock } from "index/typings/markdown";
+import { t } from "i18n";
 
 export class MathSearchModal extends SuggestModal<MathBlock> implements SuggestParent {
     app: App;
@@ -18,7 +19,7 @@ export class MathSearchModal extends SuggestModal<MathBlock> implements SuggestP
         this.app = plugin.app;
         this.core = new WholeVaultTheoremEquationSearchCore(this);
         this.core.setScope();
-        this.setPlaceholder('Type here...');
+        this.setPlaceholder(t('search.typePlaceholder'));
 
         this.queryType = this.plugin.extraSettings.searchModalQueryType;
         this.range = this.plugin.extraSettings.searchModalRange;
@@ -30,11 +31,11 @@ export class MathSearchModal extends SuggestModal<MathBlock> implements SuggestP
         this.limit = this.plugin.extraSettings.suggestNumber;
 
         new Setting(this.topEl)
-            .setName('Query type')
+            .setName(t('search.queryType'))
             .addDropdown((dropdown) => {
-                dropdown.addOption('both', 'Theorems and equations')
-                    .addOption('theorem', 'Theorems')
-                    .addOption('equation', 'Equations');
+                dropdown.addOption('both', t('search.queryTypes.both'))
+                    .addOption('theorem', t('search.queryTypes.theorem'))
+                    .addOption('equation', t('search.queryTypes.equation'));
 
                 // recover the last state
                 dropdown.setValue(this.plugin.extraSettings.searchModalQueryType)
@@ -52,12 +53,12 @@ export class MathSearchModal extends SuggestModal<MathBlock> implements SuggestP
             });
 
         new Setting(this.topEl)
-            .setName('Search range')
+            .setName(t('search.searchRange'))
             .addDropdown((dropdown) => {
-                dropdown.addOption('vault', 'Vault')
-                    .addOption('recent', 'Recent notes')
-                    .addOption('active', 'Active note')
-                    .addOption('dataview', 'Dataview query');
+                dropdown.addOption('vault', t('search.searchRanges.vault'))
+                    .addOption('recent', t('search.searchRanges.recent'))
+                    .addOption('active', t('search.searchRanges.active'))
+                    .addOption('dataview', t('search.searchRanges.dataview'));
 
                 // recover the last state
                 dropdown.setValue(this.plugin.extraSettings.searchModalRange)
@@ -74,8 +75,8 @@ export class MathSearchModal extends SuggestModal<MathBlock> implements SuggestP
             });
 
         this.dvQueryField = new Setting(this.topEl)
-            .setName('Dataview query')
-            .setDesc('Only LIST queries are supported.')
+            .setName(t('search.dataviewQuery'))
+            .setDesc(t('search.dataviewQueryDesc'))
             .then(setting => {
                 setting.controlEl.style.width = '60%';
             })
@@ -84,7 +85,7 @@ export class MathSearchModal extends SuggestModal<MathBlock> implements SuggestP
                 text.inputEl.style.width = '100%';
 
                 text.setValue(this.plugin.extraSettings.searchModalDvQuery) // recover the last state
-                    .setPlaceholder('LIST ...')
+                    .setPlaceholder(t('search.dataviewQueryPlaceholder'))
                     .onChange((dvQuery) => {
                         if (this.core instanceof DataviewQuerySearchCore) {
                             this.core.dvQuery = dvQuery;
@@ -109,7 +110,7 @@ export class MathSearchModal extends SuggestModal<MathBlock> implements SuggestP
         if (this.range === 'dataview') {
             if (!core) {
                 this.dvQueryField.setDisabled(true);
-                this.dvQueryField.setDesc('Retry after enabling Dataview.')
+                this.dvQueryField.setDesc(t('search.dataviewDisabled'))
                     .then(setting => setting.descEl.style.color = '#ea5555');
             }
             this.dvQueryField.settingEl.show();

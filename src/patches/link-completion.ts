@@ -8,10 +8,11 @@ import { formatTitle } from 'utils/format';
 import { _readTheoremCalloutSettings } from 'utils/parse';
 import { capitalize } from 'utils/general';
 import { renderTextWithMath } from "utils/render";
+import { t } from "i18n";
 
 export const patchLinkCompletion = (plugin: LatexReferencer) => {
     const suggest = (plugin.app.workspace as any).editorSuggest.suggests[0]; // built-in link completion
-    if (!Object.hasOwn(suggest, 'suggestManager')) new Notice(`Failed to patch Obsidian\'s built-in link completion. Please reload ${plugin.manifest.name}.`);
+    if (!Object.hasOwn(suggest, 'suggestManager')) new Notice(`${t('notices.failedToPatchLinkCompletion')} ${plugin.manifest.name}.`);
     const prototype = suggest.constructor.prototype as EditorSuggest<any>;
 
     plugin.register(around(prototype, {
