@@ -1,8 +1,8 @@
-import { MarkdownView, Plugin } from 'obsidian';
+import { MarkdownView, Plugin, loadMathJax } from 'obsidian';
 import { StateField, Extension, RangeSet } from '@codemirror/state';
 
-import * as MathLinks from 'obsidian-mathlinks';
-import { registerQuickPreview } from 'obsidian-quick-preview';
+import { MathLinksManager } from 'integrations/mathlinks';
+import { registerQuickPreview } from 'integrations/quick-preview';
 
 import { MathContextSettings, DEFAULT_SETTINGS, ExtraSettings, DEFAULT_EXTRA_SETTINGS, UNION_TYPE_MATH_CONTEXT_SETTING_KEYS, UNION_TYPE_EXTRA_SETTING_KEYS } from 'settings/settings';
 import { MathSettingTab } from "settings/tab";
@@ -33,16 +33,17 @@ export default class LatexReferencer extends Plugin {
 	settings: Record<string, Partial<MathContextSettings>>;
 	extraSettings: ExtraSettings;
 	excludedFiles: string[];
-	dependencies: Record<string, { id: string, name: string, version: string }> = {
-		"mathlinks": { id: "mathlinks", name: "MathLinks", version: "0.5.3" }
-	};
+	dependencies: Record<string, { id: string, name: string, version: string }> = {};
 	indexManager: MathIndexManager;
 	editorExtensions: Extension[];
 	theoremCalloutsField: StateField<RangeSet<TheoremCalloutInfo>>;
 	// proofPositionField: StateField<ProofPosition[]>;
 	lastHoverLinktext: string | null;
+	mathLinksManager: MathLinksManager | null = null;
 
 	async onload() {
+		// Load MathJax for math rendering in links
+		await loadMathJax();
 
 		/** Settings */
 
@@ -54,10 +55,9 @@ export default class LatexReferencer extends Plugin {
 		await this.saveSettings();
 		this.addSettingTab(new MathSettingTab(this.app, this));
 
-		/** Dependencies check */
+		/** Version migration checks */
 
 		this.app.workspace.onLayoutReady(async () => {
-			const dependenciesOK = Object.keys(this.dependencies).every((id) => this.checkDependency(id));
 			const v1 = !first && ((version as string | undefined)?.startsWith("1.") ?? true);
 
 			if (v1 || version.localeCompare('2.2.0', undefined, { numeric: true }) < 0) {
@@ -68,8 +68,8 @@ export default class LatexReferencer extends Plugin {
 				new PluginSplitNoticeModal(this).open();
 			}
 
-			if (!dependenciesOK || v1) {
-				new DependencyNotificationModal(this, dependenciesOK, v1).open();
+			if (v1) {
+				new DependencyNotificationModal(this, true, v1).open();
 			}
 		});
 
@@ -81,12 +81,14 @@ export default class LatexReferencer extends Plugin {
 		// @ts-ignore
 		(window['mathIndex'] = this.indexManager.index) && this.register(() => delete window['mathIndex'])
 
-		// wait until the layout is ready to ensure MathLinks has been loaded when calling addProvider()
-		this.app.workspace.onLayoutReady(() => {
-			this.addChild(
-				MathLinks.addProvider(this.app, (mathLinks) => new CleverefProvider(mathLinks, this))
-			);
-		});
+		/** Integrated MathLinks */
+		this.mathLinksManager = new MathLinksManager(this);
+		this.addChild(this.mathLinksManager);
+		
+		// Register CleverefProvider
+		const cleverefProvider = new CleverefProvider(this);
+		this.mathLinksManager.registerProvider(cleverefProvider);
+		this.addChild(cleverefProvider);
 
 
 		this.registerEvent(
@@ -151,8 +153,8 @@ export default class LatexReferencer extends Plugin {
 				line: item.$position.start,
 			};
 		};
-		registerQuickPreview(this.app, this, LinkAutocomplete, itemNormalizer);
-		registerQuickPreview(this.app, this, MathSearchModal, itemNormalizer);
+		registerQuickPreview(this, this, LinkAutocomplete, itemNormalizer);
+		registerQuickPreview(this, this, MathSearchModal, itemNormalizer);
 
 		/** Markdown post processors */
 
@@ -265,21 +267,7 @@ export default class LatexReferencer extends Plugin {
 		this.registerEditorSuggest(new LinkAutocomplete(this));
 	}
 
-	/**
-	 * Return true if the required plugin with the specified id is enabled and its version matches the requriement.
-	 * @param id 
-	 * @returns 
-	 */
-	checkDependency(id: string): boolean {
-		if (!this.app.plugins.enabledPlugins.has(id)) {
-			return false;
-		}
-		const depPlugin = this.app.plugins.getPlugin(id);
-		if (depPlugin) {
-			return !isPluginOlderThan(depPlugin, this.dependencies[id].version)
-		}
-		return false;
-	}
+
 
 	setProfileTagAsCSSClass(view: MarkdownView) {
 		if (!view.file) return;

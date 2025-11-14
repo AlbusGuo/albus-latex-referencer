@@ -7,6 +7,9 @@ declare module "obsidian" {
             enabledPlugins: Set<string>;
             plugins: {
                 [id: string]: any;
+                ["supercharged-links-obsidian"]?: {
+                    settings: SuperchargedLinksSettings;
+                };
             };
             getPlugin: (id: string) => Plugin | null;
         };
@@ -14,6 +17,20 @@ declare module "obsidian" {
     interface Editor {
         cm?: EditorView;
     }
+    
+    interface MetadataCache {
+        /** Custom events for MathLinks integration */
+        on(
+            name: "mathlinks:update",
+            callback: (file: TFile) => any
+        ): EventRef;
+
+        on(
+            name: "mathlinks:update-all",
+            callback: () => any
+        ): EventRef;
+    }
+    
     // Reference: https://github.com/tadashi-aikawa/obsidian-various-complements-plugin/blob/be4a12c3f861c31f2be3c0f81809cfc5ab6bb5fd/src/ui/AutoCompleteSuggest.ts#L595-L619
     interface EditorSuggest<T> {
         scope: Scope;
@@ -38,6 +55,20 @@ declare module "obsidian" {
             suggestions: Element[];
         };
     }
+}
+
+// Type definitions for Supercharged Links
+type SelectorTypes = 'attribute' | 'tag' | 'path';
+
+interface CSSLink {
+    type: SelectorTypes
+    name: string
+    value: string
+}
+
+interface SuperchargedLinksSettings {
+    targetTags: boolean;
+    selectors: CSSLink[];
 }
 
 export type LeafArgs = [newLeaf?: PaneType | boolean] | [newLeaf?: 'split', direction?: SplitDirection];

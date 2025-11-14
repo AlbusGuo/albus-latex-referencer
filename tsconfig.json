@@ -26,5 +26,6 @@
   ],
   "exclude": [
     "src/legacy/*.ts",
+    "ref/**/*"
   ]
 }

@@ -7,7 +7,6 @@ import { ImportResult } from "./web-worker/message";
 import { MarkdownPage } from "./typings/markdown";
 import LatexReferencer from "../main";
 import { iterDescendantFiles } from "utils/obsidian";
-import * as MathLinks from "obsidian-mathlinks";
 
 
 export class MathIndexManager extends Component {
@@ -87,7 +86,7 @@ export class MathIndexManager extends Component {
                 iterDescendantFiles(file, (descendantFile) => {
                     if (descendantFile.extension === "md") {
                         this.index.updateNames(descendantFile);
-                        MathLinks.update(this.app, descendantFile);
+                        this.plugin.mathLinksManager?.update(descendantFile);
                     };
                 });
             })
@@ -122,7 +121,7 @@ export class MathIndexManager extends Component {
             this.index.touch();
             this.trigger("update", this.revision);
             this.trigger("index-initialized");
-            MathLinks.update(this.app);
+            this.plugin.mathLinksManager?.update();
         });
 
         this.addChild(init);
@@ -142,7 +141,7 @@ export class MathIndexManager extends Component {
         this.index.delete(oldPath);
         await this.reload(file);
         this.index.updateNames(file);
-        MathLinks.update(this.app);
+        this.plugin.mathLinksManager?.update();
     }
 
     /** Queue a file for reloading; this is done asynchronously in the background and may take a few seconds. */
@@ -217,7 +216,7 @@ export class MathIndexManager extends Component {
         // recompute theorem/equation numbers for the previously or currently linked files
         toBeUpdated.forEach((fileToBeUpdated) => {
             this.index.updateNames(fileToBeUpdated);
-            MathLinks.update(this.app, fileToBeUpdated);
+            this.plugin.mathLinksManager?.update(fileToBeUpdated);
         });
         this.trigger("update", this.revision);
     }
@@ -249,7 +248,7 @@ export class MathIndexManager extends Component {
             this.index.updateNames(fileToBeUpdated);
         });
         this.trigger("update", this.revision);
-        MathLinks.update(this.app);
+        this.plugin.mathLinksManager?.update();
     }
 
     // Event propogation.
@@ -372,7 +371,7 @@ export class MathIndexInitializer extends Component {
             this.active = false;
 
             this.manager.vault.getMarkdownFiles().forEach((file) => this.manager.index.updateNames(file));
-            MathLinks.update(this.manager.app);
+            this.manager.plugin.mathLinksManager?.update();
 
             // All work is done, resolve.
             this.done.resolve({

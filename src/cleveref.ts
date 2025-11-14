@@ -1,18 +1,18 @@
 import { EquationBlock } from 'index/typings/markdown';
 import { TFile, HeadingSubpathResult, BlockSubpathResult, App } from 'obsidian';
-import * as MathLinks from 'obsidian-mathlinks';
+import { Provider } from 'integrations/mathlinks/provider';
 
 import LatexReferencer from 'main';
 import { MathIndex } from 'index/math-index';
 import { MarkdownPage, MathBlock, TheoremCalloutBlock } from 'index/typings/markdown';
 
 
-export class CleverefProvider extends MathLinks.Provider {
+export class CleverefProvider extends Provider {
     app: App;
     index: MathIndex;
 
-    constructor(mathLinks: any, public plugin: LatexReferencer) {
-        super(mathLinks);
+    constructor(public plugin: LatexReferencer) {
+        super(plugin);
         this.app = plugin.app;
         this.index = plugin.indexManager.index;
     }
@@ -21,6 +21,7 @@ export class CleverefProvider extends MathLinks.Provider {
         parsedLinktext: { path: string; subpath: string; },
         targetFile: TFile | null,
         targetSubpathResult: HeadingSubpathResult | BlockSubpathResult | null,
+        sourceFile: TFile | null,
     ): string | null {
         const { path, subpath } = parsedLinktext;
         if (targetFile === null) return null;

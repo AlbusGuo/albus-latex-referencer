@@ -40,7 +40,7 @@ https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/
 Theorems & equations can be **dynamically/automatically numbered**, while you can statically/manually number them if you want.
 The number prefix can be either explicitly specified or automatically inferred from the note title.
 
-Thanks to the integration with [MathLinks](https://github.com/zhaoshenzhai/obsidian-mathlinks), links to theorems/equations are displayed with their title or number, similarly to the `cleveref` package in LaTeX. (No need for manually typing aliases!)
+This plugin includes integrated MathLinks functionality, so links to theorems/equations are displayed with their title or number, similarly to the `cleveref` package in LaTeX. (No need for manually typing aliases!)
 
 You can also customize the appearance of theorem callouts using CSS snippets; see [here](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/theorem-callouts/styling.html).
 
@@ -70,7 +70,7 @@ Since version 2 is still beta, it's not on the community plugin browser yet.
 
 ### Obsidian plugins
 
-This plugin requires [MathLinks](https://github.com/zhaoshenzhai/obsidian-mathlinks) version 0.5.3 or higher installed to work properly ([Clever referencing](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/clever-referencing.html)).
+**No external plugin dependencies required!** This plugin now includes integrated MathLinks and Quick Preview functionality.
 
 In version 2, [Dataview](https://github.com/blacksmithgu/obsidian-dataview) is no longer required. But I strongly recommend installing it because it enhances this plugin's [search](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/search-&-link-auto-completion/search-modal.html) functionality significantly.
 

@@ -155,7 +155,7 @@ export class DependencyNotificationModal extends Modal {
          * SOFTWARE.
          */
         for (const depenedency of Object.values(this.plugin.dependencies)) {
-            const depPlugin = this.app.plugins.getPlugin(depenedency.id);
+            const depPlugin = (this.app.plugins as any).getPlugin(depenedency.id);
             const isValid = depPlugin && !isPluginOlderThan(depPlugin, depenedency.version);
             const setting = new Setting(this.contentEl)
                 .setName(depenedency.name)
