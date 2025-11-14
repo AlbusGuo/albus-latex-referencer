@@ -269,12 +269,28 @@ export class MathIndex {
         let autoNumberedTheoremCount = 0;
         // For separate numbering mode: maintain a separate counter for each theorem type
         const separateCounters: Record<string, number> = {};
+        // For detailed numbering mode: get h1 headings and maintain counters per section and type
+        const h1Headings = settings.numberingMode === 'detailed' 
+            ? (this.metadataCache.getFileCache(file)?.headings?.filter(h => h.level === 1) || [])
+            : [];
+        const detailedCounters: Record<number, Record<string, number>> = {}; // sectionIndex -> type -> count
         let mainTheorem: TheoremCalloutBlock | null = null;
 
         const equationNumberInit = +(settings.eqNumberInit);
         let equationCount = 0;
         const eqPrefix = getEqNumberPrefix(this.plugin.app, file, settings);
         const eqSuffix = settings.eqNumberSuffix;
+
+        // Helper function to find which h1 section a line belongs to (for detailed mode)
+        const getH1SectionIndex = (lineNumber: number): number => {
+            if (h1Headings.length === 0) return 0;
+            for (let i = h1Headings.length - 1; i >= 0; i--) {
+                if (lineNumber >= h1Headings[i].position.start.line) {
+                    return i + 1; // Section numbers start from 1
+                }
+            }
+            return 0; // Before the first h1
+        };
 
         while (block = this.load(`${file.path}/block${blockOrdinal++}`)) {
             if (TheoremCalloutBlock.isTheoremCalloutBlock(block)) {
@@ -286,7 +302,25 @@ export class MathIndex {
                 const resolvedSettings = Object.assign({}, settings, block.$settings);
                 if (block.$settings.number == 'auto') {
                     // Choose the counter based on the numbering mode
-                    if (settings.numberingMode === 'separate') {
+                    if (settings.numberingMode === 'detailed') {
+                        // Detailed numbering: section.number (e.g., 1.1, 2.3)
+                        const sectionIndex = getH1SectionIndex(block.$position.start);
+                        const type = block.$settings.type;
+                        
+                        // Initialize section counter if needed
+                        if (!(sectionIndex in detailedCounters)) {
+                            detailedCounters[sectionIndex] = {};
+                        }
+                        // Initialize type counter for this section if needed
+                        if (!(type in detailedCounters[sectionIndex])) {
+                            detailedCounters[sectionIndex][type] = 0;
+                        }
+                        
+                        block.$index = detailedCounters[sectionIndex][type];
+                        (resolvedSettings as ResolvedMathSettings)._index = detailedCounters[sectionIndex][type]++;
+                        // Store section index for later use in formatting
+                        (resolvedSettings as any)._sectionIndex = sectionIndex;
+                    } else if (settings.numberingMode === 'separate') {
                         // Separate numbering: each type has its own counter
                         const type = block.$settings.type;
                         if (!(type in separateCounters)) {

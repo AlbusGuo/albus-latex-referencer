@@ -91,7 +91,7 @@ export const zhCN: TranslationKeys = {
 		
 		theoremCalloutsNumbering: '定理标注 - 编号',
 		numberingMode: '编号模式',
-		numberingModeDesc: '选择定理标注的编号方式：“统一编号”（默认）- 所有类型共用一个计数器（定理 1、定义 2、引理 3、...）；“分开编号”- 每种类型有自己的计数器（定理 1、定义 1、引理 1、...）；“详细编号”- 预留以供未来使用。',
+		numberingModeDesc: '选择定理标注的编号方式：“统一编号”（默认）- 所有类型共用一个计数器（定理 1、定义 2、引理 3、...）；“分开编号”- 每种类型有自己的计数器（定理 1、定义 1、引理 1、...）；“详细编号”- 基于一级标题添加章节号，每种类型在各章节中独立计数（定理 1.1、定义 1.1、定理 2.1、...）。',
 		inferNumberPrefix: '从笔记标题或属性推断前缀',
 		inferNumberPrefixDesc: '自动从笔记标题或属性推断前缀。请参阅文档（设置 > 前缀推断）中的示例。',
 		inferNumberPrefixFromProperty: '使用属性作为来源',

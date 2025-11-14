@@ -3,12 +3,16 @@ import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 
 import LatexReferencer from 'main';
 import { readTheoremCalloutSettings } from 'utils/parse';
+import { resolveSettings } from 'utils/plugin';
 import { editorInfoField } from 'obsidian';
 
 export const CALLOUT = /HyperMD-callout_HyperMD-quote_HyperMD-quote-([1-9][0-9]*)/;
 
 export class TheoremCalloutInfo extends RangeValue {
-    constructor(public index: number | null) {
+    constructor(
+        public index: number | null,
+        public sectionIndex?: number // For detailed numbering mode
+    ) {
         super();
     }
 }
@@ -67,7 +71,33 @@ function getTheoremCalloutInfos(plugin: LatexReferencer, state: EditorState, doc
     // syntaxTree returns a potentially imcomplete tree (limited by viewport), so we need to ensure it's complete
     const tree = ensureSyntaxTree(state, doc.length) ?? syntaxTree(state);
 
-    let theoremIndex = init; // incremented when a auto-numbered theorem is found
+    const file = state.field(editorInfoField).file;
+    if (!file) return ranges;
+
+    const settings = resolveSettings(undefined, plugin, file);
+    const numberingMode = settings.numberingMode || 'unified';
+
+    // For separate numbering: maintain counters per type
+    const separateCounters: Record<string, number> = {};
+    
+    // For detailed numbering: get h1 headings and maintain counters per section and type
+    const h1Headings = numberingMode === 'detailed'
+        ? (plugin.app.metadataCache.getFileCache(file)?.headings?.filter(h => h.level === 1) || [])
+        : [];
+    const detailedCounters: Record<number, Record<string, number>> = {};
+
+    // Helper function to find which h1 section a line belongs to
+    const getH1SectionIndex = (lineNumber: number): number => {
+        if (h1Headings.length === 0) return 0;
+        for (let i = h1Headings.length - 1; i >= 0; i--) {
+            if (lineNumber >= h1Headings[i].position.start.line) {
+                return i + 1; // Section numbers start from 1
+            }
+        }
+        return 0; // Before the first h1
+    };
+
+    let unifiedIndex = init; // For unified numbering mode
 
     tree.iterate({
         from, to: doc.length,
@@ -81,10 +111,40 @@ function getTheoremCalloutInfos(plugin: LatexReferencer, state: EditorState, doc
             const match = node.name.match(CALLOUT);
             if (!match) return false;
 
-            const settings = readTheoremCalloutSettings(text, plugin.extraSettings.excludeExampleCallout);
-            if (!settings) return false;
+            const calloutSettings = readTheoremCalloutSettings(text, plugin.extraSettings.excludeExampleCallout);
+            if (!calloutSettings) return false;
 
-            const value = new TheoremCalloutInfo(settings.number === 'auto' ? theoremIndex++ : null);
+            let theoremIndex: number | null = null;
+            let sectionIndex: number | undefined = undefined;
+
+            if (calloutSettings.number === 'auto') {
+                const type = calloutSettings.type;
+                
+                if (numberingMode === 'detailed') {
+                    // Detailed numbering: section.number
+                    const line = doc.lineAt(node.from).number - 1; // Convert to 0-based
+                    sectionIndex = getH1SectionIndex(line);
+                    
+                    if (!(sectionIndex in detailedCounters)) {
+                        detailedCounters[sectionIndex] = {};
+                    }
+                    if (!(type in detailedCounters[sectionIndex])) {
+                        detailedCounters[sectionIndex][type] = 0;
+                    }
+                    theoremIndex = detailedCounters[sectionIndex][type]++;
+                } else if (numberingMode === 'separate') {
+                    // Separate numbering: each type has its own counter
+                    if (!(type in separateCounters)) {
+                        separateCounters[type] = 0;
+                    }
+                    theoremIndex = separateCounters[type]++;
+                } else {
+                    // Unified numbering (default): all types share one counter
+                    theoremIndex = unifiedIndex++;
+                }
+            }
+
+            const value = new TheoremCalloutInfo(theoremIndex, sectionIndex);
             const range = value.range(node.from, node.to);
             ranges.push(range);
 

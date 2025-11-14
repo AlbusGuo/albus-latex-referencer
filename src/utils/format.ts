@@ -58,7 +58,17 @@ export function formatTitleWithoutSubtitle(plugin: LatexReferencer, file: TFile,
                 settings.numberInit = settings.numberInit ?? 1;
                 const num = +settings._index + +settings.numberInit;
                 const style = settings.numberStyle ?? DEFAULT_SETTINGS.numberStyle as NumberStyle;
-                title += ` ${getNumberPrefix(plugin.app, file, settings)}${CONVERTER[style](num)}${settings.numberSuffix}`;
+                
+                // For detailed numbering mode, prepend section number if available
+                let numberStr = '';
+                if (settings.numberingMode === 'detailed' && (settings as any)._sectionIndex) {
+                    const sectionIndex = (settings as any)._sectionIndex;
+                    numberStr = `${sectionIndex}.${CONVERTER[style](num)}`;
+                } else {
+                    numberStr = CONVERTER[style](num);
+                }
+                
+                title += ` ${getNumberPrefix(plugin.app, file, settings)}${numberStr}${settings.numberSuffix}`;
             }
         } else {
             title += ` ${settings.number}`;

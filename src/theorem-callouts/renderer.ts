@@ -22,15 +22,59 @@ export const createTheoremCalloutPostProcessor = (plugin: LatexReferencer) => as
     if (!(file instanceof TFile)) return null;
 
     const pdf = isPdfExport(element);
-    let index = 0; // for numbering theorems in PDf export
+    
+    // For PDF export: prepare numbering based on mode
+    let unifiedIndex = 0;
+    const separateCounters: Record<string, number> = {};
+    const detailedCounters: Record<number, Record<string, number>> = {};
+    const settings = pdf ? resolveSettings(undefined, plugin, file) : null;
+    const numberingMode = settings?.numberingMode || 'unified';
+    const h1Headings = (pdf && numberingMode === 'detailed')
+        ? (plugin.app.metadataCache.getFileCache(file)?.headings?.filter(h => h.level === 1) || [])
+        : [];
 
     for (const calloutEl of element.querySelectorAll<HTMLElement>(`.callout`)) {
         const type = calloutEl.getAttribute('data-callout')!.toLowerCase();
 
         if (isTheoremCallout(plugin, type)) {
             if (pdf) { // preprocess for theorem numbering in PDF export
-                const settings = readSettingsFromEl(calloutEl);
-                if (settings?.number === 'auto') calloutEl.setAttribute('data-theorem-index', String(index++));
+                const calloutSettings = readSettingsFromEl(calloutEl);
+                if (calloutSettings?.number === 'auto') {
+                    const theoremType = calloutSettings.type;
+                    
+                    if (numberingMode === 'detailed') {
+                        // Get line number for this callout (approximate from DOM structure)
+                        const sectionInfo = context.getSectionInfo(calloutEl);
+                        const lineNumber = sectionInfo?.lineStart ?? 0;
+                        
+                        let sectionIndex = 0;
+                        if (h1Headings.length > 0) {
+                            for (let i = h1Headings.length - 1; i >= 0; i--) {
+                                if (lineNumber >= h1Headings[i].position.start.line) {
+                                    sectionIndex = i + 1;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (!(sectionIndex in detailedCounters)) {
+                            detailedCounters[sectionIndex] = {};
+                        }
+                        if (!(theoremType in detailedCounters[sectionIndex])) {
+                            detailedCounters[sectionIndex][theoremType] = 0;
+                        }
+                        
+                        calloutEl.setAttribute('data-theorem-index', String(detailedCounters[sectionIndex][theoremType]++));
+                        calloutEl.setAttribute('data-section-index', String(sectionIndex));
+                    } else if (numberingMode === 'separate') {
+                        if (!(theoremType in separateCounters)) {
+                            separateCounters[theoremType] = 0;
+                        }
+                        calloutEl.setAttribute('data-theorem-index', String(separateCounters[theoremType]++));
+                    } else {
+                        calloutEl.setAttribute('data-theorem-index', String(unifiedIndex++));
+                    }
+                }
             }
 
             const theoremCallout = new TheoremCalloutRenderer(calloutEl, context, file, plugin);
@@ -147,6 +191,9 @@ class TheoremCalloutRenderer extends MarkdownRenderChild {
 
             const livePreviewIndex = this.containerEl.getAttribute('data-theorem-index');
             if (livePreviewIndex !== null) settings._index = +livePreviewIndex;
+            
+            const sectionIndex = this.containerEl.getAttribute('data-section-index');
+            if (sectionIndex !== null) (settings as any)._sectionIndex = +sectionIndex;
 
             const resolvedSettings = resolveSettings(settings, this.plugin, this.file);
             const newMainTitle = formatTitleWithoutSubtitle(this.plugin, this.file, resolvedSettings);
@@ -309,6 +356,10 @@ class TheoremCalloutRenderer extends MarkdownRenderChild {
         if (!settings) return null;
         const livePreviewIndex = this.containerEl.getAttribute('data-theorem-index');
         if (livePreviewIndex !== null) settings._index = +livePreviewIndex;
+        
+        const sectionIndex = this.containerEl.getAttribute('data-section-index');
+        if (sectionIndex !== null) (settings as any)._sectionIndex = +sectionIndex;
+        
         const resolvedSettings = resolveSettings(settings, this.plugin, this.file);
 
         let theoremSubtitleEl = this.containerEl.querySelector<HTMLElement>('.theorem-callout-subtitle');

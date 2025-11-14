@@ -26,8 +26,19 @@ export const createTheoremCalloutNumberingViewPlugin = (plugin: LatexReferencer)
                 if (iter.from !== pos) continue; // insertion or deletion occured before this callout, and the posAtDom is out-dated for some reasons: do not update the theorem number
                 
                 const index = iter.value?.index;
-                if (typeof index === 'number') calloutEl.setAttribute('data-theorem-index', String(index));
-                else calloutEl.removeAttribute('data-theorem-index');
+                const sectionIndex = iter.value?.sectionIndex;
+                
+                if (typeof index === 'number') {
+                    calloutEl.setAttribute('data-theorem-index', String(index));
+                    if (typeof sectionIndex === 'number') {
+                        calloutEl.setAttribute('data-section-index', String(sectionIndex));
+                    } else {
+                        calloutEl.removeAttribute('data-section-index');
+                    }
+                } else {
+                    calloutEl.removeAttribute('data-theorem-index');
+                    calloutEl.removeAttribute('data-section-index');
+                }
             }
         }
     }
