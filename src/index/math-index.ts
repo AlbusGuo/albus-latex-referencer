@@ -257,7 +257,7 @@ export class MathIndex {
      * Additionally, set $main of a theorem callout to true if it is the only one in the file, if configured as such.
      * Fiinally, set $refName of the page to the refName of the main theorem, if it exists.
      * 
-     * Warning: This function doesn't trigger MathLinks.update(), so you have to call it by yourself!
+     * Warning: This function doesn't trigger plugin.mathLinksManager?.update(), so you have to call it by yourself!
      */
     public updateNames(file: TFile) {
         const settings = resolveSettings(undefined, this.plugin, file);
