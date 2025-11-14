@@ -1,7 +1,15 @@
 import { EditorState, ChangeSet, RangeValue, RangeSet, SelectionRange } from '@codemirror/state';
 import { SyntaxNodeRef } from '@lezer/common';
-import { MathInfoSet } from 'render-math-in-callouts';
 import { EditorPosition, Loc, MarkdownView, editorLivePreviewField } from "obsidian";
+
+// Type alias for math info sets (used in debugging utilities)
+interface MathInfo extends RangeValue {
+    mathText: string;
+    display?: boolean;
+    insideCallout?: boolean;
+    overlap?: boolean;
+}
+type MathInfoSet = RangeSet<MathInfo>;
 
 export function locToEditorPosition(loc: Loc): EditorPosition {
     return { ch: loc.col, line: loc.line };
@@ -39,7 +47,7 @@ export function printNode(node: SyntaxNodeRef, state: EditorState) {
 export function printMathInfoSet(set: MathInfoSet, state: EditorState) {
     // Debugging utility
     console.log("MathInfoSet:");
-    set.between(0, state.doc.length, (from, to, value) => {
+    set.between(0, state.doc.length, (from: number, to: number, value: MathInfo) => {
         console.log(`  ${from}-${to}: ${value.mathText} ${value.display ? "(display)" : ""} ${value.insideCallout ? "(in callout)" : ""} ${value.overlap === undefined ? "(overlap not checked yet)" : value.overlap ? "(overlapping)" : "(non-overlapping)"}`);
     });
 }
