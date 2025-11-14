@@ -17,6 +17,30 @@
         display: none;
     }
 
+    .theorem-callout .callout-title {
+        display: inline;
+        padding: 0;
+        background-color: transparent;
+    }
+
+    .theorem-callout .callout-title-inner {
+        display: inline;
+    }
+
+    .theorem-callout .callout-title-inner > * {
+        display: inline;
+    }
+
+    .theorem-callout .callout-content {
+        display: inline;
+        padding: 0;
+    }
+
+    .theorem-callout .callout-content > * {
+        display: inline;
+        margin: 0;
+    }
+
     .theorem-callout-main-title {
         font-weight: bolder;
     }
