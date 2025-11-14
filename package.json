@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-math-booster",
+	"name": "albus-latex-referencer",
 	"version": "2.2.0",
 	"description": "An Obsidian.md plugin that provides a powerful indexing & referencing system for theorems & equations in your vault. Bring LaTeX-like workflow into Obsidian with theorem environments, automatic equation numbering, and more.",
 	"scripts": {
